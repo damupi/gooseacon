@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "gooseacon"
+version = "0.1.0"
+description = "Google Search Console CLI for search analytics, sitemaps, and URL inspection"
+readme = "README.md"
+license = "MIT"
+requires-python = ">=3.11"
+authors = [{ name = "damupi" }]
+dependencies = [
+  "typer>=0.12", "rich>=13", "pydantic>=2",
+  "google-api-python-client>=2", "google-auth>=2", "google-auth-oauthlib>=1",
+]
+
+[project.urls]
+Homepage = "https://github.com/damupi/gooseacon"
+Repository = "https://github.com/damupi/gooseacon"
+
+[project.scripts]
+gooseacon = "gooseacon.cli:app"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-cov>=5", "ruff>=0.9"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/gooseacon"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "--cov=gooseacon --cov-report=term-missing"
