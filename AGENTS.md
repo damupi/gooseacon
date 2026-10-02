@@ -175,7 +175,7 @@ Sites, sitemaps, and Search Analytics use `webmasters/v3`. URL Inspection uses `
 - Do not persist environment tokens or environment overrides into saved settings.
 - Add regression tests for behavior changes, especially auth, errors, request bodies, pagination, and output safety.
 - Update `README.md` and the relevant skill/reference when command behavior changes. Keep the agent focused on analysis rather than duplicating CLI syntax.
-- If changing the version, keep `pyproject.toml` and `src/gooseacon/__init__.py` aligned and refresh `uv.lock` as needed. Do not bump versions or publish releases unless requested.
+- Let Release Please manage version bumps through its release PR. Its Python strategy updates `pyproject.toml` and `src/gooseacon/__init__.py`; the configured TOML extra-file updater changes only gooseacon's version in `uv.lock`. The manifest and changelog are also release-managed. Do not bump versions or publish releases unless requested.
 
 ## Safety boundaries
 
@@ -186,6 +186,14 @@ Sites, sitemaps, and Search Analytics use `webmasters/v3`. URL Inspection uses `
 - Tests must not use real credentials or send live API requests. Mock API execution and isolate config storage.
 - Live smoke tests are separate from the test suite: use existing authorized access, read-only commands, small row limits, and bounded inspections. Do not claim live coverage when only mocks or request construction were checked.
 - GSC clicks are not GA4 sessions/conversions; CTR is fractional, average position is not a simple average of rows, and inspection describes Google's indexed version rather than a live crawl.
+
+## Release workflow
+
+Configuration lives in `release-please-config.json` and `.release-please-manifest.json`; `.github/workflows/release-please.yml` opens release PRs on `main` pushes and creates releases after they are merged. Use Conventional Commits (`feat:`, `fix:`, and breaking-change markers). The empty bootstrap manifest means no version has yet been released, not that the current package version is missing.
+
+Before an authorized release, review its PR, ensure all version locations agree, and run CI on its head branch. With the workflow's default `GITHUB_TOKEN`, generated PRs do not automatically trigger PR CI. Use `gh workflow run ci.yml --ref <release-head-branch> --repo damupi/gooseacon`, verify that run succeeded, then merge only with authorization. Release Please publishes the tag and GitHub release; the same workflow tests/builds the tagged source and attaches distributions. It does not publish to PyPI. See the README's release section for permissions and upload recovery.
+
+Do not store a personal token as a repository secret or change Actions security settings without explicit approval.
 
 ## Validate changes
 

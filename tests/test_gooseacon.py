@@ -9,7 +9,7 @@ from googleapiclient.errors import HttpError
 from pydantic import ValidationError
 from typer.testing import CliRunner
 
-from gooseacon import auth, client, config
+from gooseacon import __version__, auth, client, config
 from gooseacon.analytics import Query, flatten_rows, run_query
 from gooseacon.cli import app
 from gooseacon.output import Format, render
@@ -46,7 +46,7 @@ def request(**kwargs):
 def test_version_and_help():
     result = runner.invoke(app, ["--version"])
     assert result.exit_code == 0
-    assert "gooseacon 0.1.0" in result.stdout
+    assert f"gooseacon {__version__}" in result.stdout
     for group in ["analytics", "auth", "config", "sites", "sitemaps", "urls"]:
         assert runner.invoke(app, [group, "--help"]).exit_code == 0
 

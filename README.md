@@ -216,6 +216,28 @@ The agent is bundled with this repository and is not automatically installed. Se
 
 Python + Typer + Pydantic + Google's API client. Sites, sitemaps, and Search Analytics use `webmasters/v3`; URL Inspection uses `searchconsole/v1`. Inspired by the GSC tools in `mcp-server-google`, with validation, secure local storage, metadata-preserving output, and CLI-friendly pagination.
 
+## Releases
+
+[Release Please](https://github.com/googleapis/release-please) maintains a release PR from Conventional Commits on `main`. Merging the release PR updates `CHANGELOG.md`, the manifest, `pyproject.toml`, the runtime version, and the locked local-package version. The next workflow run creates a `vX.Y.Z` GitHub release and uploads a tested wheel and source distribution. It does not publish to PyPI.
+
+Use `feat:` for features, `fix:` for fixes, and `!` / `BREAKING CHANGE:` for breaking changes. Review release PRs before merging; do not edit published tags. The initial empty manifest bootstraps the Python strategy's first release at `0.1.0`; subsequent versions are tracked automatically.
+
+The workflow uses `GITHUB_TOKEN` and needs the repository setting **Allow GitHub Actions to create and approve pull requests**. It never approves or merges PRs. GitHub suppresses new workflow events from bot-token-created PRs, so trigger CI explicitly before merging a release PR:
+
+```sh
+# Replace RELEASE_BRANCH with the release PR's head branch.
+gh workflow run ci.yml --ref RELEASE_BRANCH --repo damupi/gooseacon
+gh run list --workflow ci.yml --branch RELEASE_BRANCH --repo damupi/gooseacon
+```
+
+Wait for that run to succeed and inspect its logs before merging. PRs created with a user/App token may trigger CI normally. No personal token is stored by this setup. If artifact upload fails after the GitHub release is created, check out its tag, rerun the validation/build steps, and upload only that tag's distributions; rerunning Release Please alone may not repeat the upload.
+
+To install a published version instead of the latest `main`:
+
+```sh
+uv tool install git+https://github.com/damupi/gooseacon.git@v0.1.0
+```
+
 ## License
 
 MIT.
