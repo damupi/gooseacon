@@ -191,6 +191,19 @@ Environment overrides:
 
 Environment overrides are not persisted by `config set` or token refresh.
 
+## Agent skill
+
+Use [`skills/gooseacon-cli/SKILL.md`](skills/gooseacon-cli/SKILL.md) to teach agents the CLI workflow, response shapes, filters, pagination, reporting caveats, and mutation safety rules.
+
+Install it in Pi from a local checkout:
+
+```sh
+mkdir -p ~/.pi/agent/skills
+cp -R skills/gooseacon-cli ~/.pi/agent/skills/
+```
+
+Run `/reload` in an active Pi session, then invoke `/skill:gooseacon-cli` or ask a GSC question. The skill loads its detailed analytics/auth references only when needed. It does not contain credentials or a fixed property list.
+
 ## Implementation
 
 Python + Typer + Pydantic + Google's API client. Sites, sitemaps, and Search Analytics use `webmasters/v3`; URL Inspection uses `searchconsole/v1`. Inspired by the GSC tools in `mcp-server-google`, with validation, secure local storage, metadata-preserving output, and CLI-friendly pagination.
