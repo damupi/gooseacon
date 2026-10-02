@@ -204,6 +204,12 @@ cp -R skills/gooseacon-cli ~/.pi/agent/skills/
 
 Run `/reload` in an active Pi session, then invoke `/skill:gooseacon-cli` or ask a GSC question. The skill loads its detailed analytics/auth references only when needed. It does not contain credentials or a fixed property list.
 
+### Analyst agent
+
+[`agents/search-console-analyst.md`](agents/search-console-analyst.md) defines a focused, read-only GSC analyst. It uses the skill for CLI syntax and adds investigation workflows, period comparisons, reporting rules, and boundaries from GA4 and GSC administration.
+
+The agent is kept in this repository only; it is not automatically installed or registered in user scope. Load it through your agent runner when needed. If the skill is not registered, the agent can read the repository's bundled skill via a relative path.
+
 ## Implementation
 
 Python + Typer + Pydantic + Google's API client. Sites, sitemaps, and Search Analytics use `webmasters/v3`; URL Inspection uses `searchconsole/v1`. Inspired by the GSC tools in `mcp-server-google`, with validation, secure local storage, metadata-preserving output, and CLI-friendly pagination.
