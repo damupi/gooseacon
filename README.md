@@ -4,6 +4,8 @@ A Google Search Console CLI by [damupi](https://github.com/damupi), following th
 
 Query search performance, inspect indexed URLs, and manage sites and sitemaps from your terminal. JSON-first output for scripts and agents; CSV and table output for reporting.
 
+For LLM setup, repository orientation, and agent installation options, read [`AGENTS.md`](AGENTS.md).
+
 ## Install
 
 Python 3.11+ required.
@@ -208,7 +210,7 @@ Run `/reload` in an active Pi session, then invoke `/skill:gooseacon-cli` or ask
 
 [`agents/search-console-analyst.md`](agents/search-console-analyst.md) defines a focused, read-only GSC analyst. It uses the skill for CLI syntax and adds investigation workflows, period comparisons, reporting rules, and boundaries from GA4 and GSC administration.
 
-The agent is kept in this repository only; it is not automatically installed or registered in user scope. Load it through your agent runner when needed. If the skill is not registered, the agent can read the repository's bundled skill via a relative path.
+The agent is bundled with this repository and is not automatically installed. See [`AGENTS.md`](AGENTS.md#install-the-analyst-agent-optional) for repository-direct, project-local, and user-scope options for Pi, plus project-local/user-scope options for Claude Code. If the skill is not registered, the agent can read the bundled skill via a relative path.
 
 ## Implementation
 
