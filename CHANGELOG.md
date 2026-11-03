@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.2.0](https://github.com/damupi/gooseacon/compare/v0.1.0...v0.2.0) (2026-11-03)
+
+
+### Features
+
+* add release checks and self-upgrade ([#3](https://github.com/damupi/gooseacon/issues/3)) ([1208f3e](https://github.com/damupi/gooseacon/commit/1208f3e0d490d7d01110834fadefb794037fa663))
+
 ## 0.1.0 (2026-10-02)
 
 

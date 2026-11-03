@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "gooseacon"
-version = "0.1.0"
+version = "0.2.0"
 description = "Google Search Console CLI for search analytics, sitemaps, and URL inspection"
 readme = "README.md"
 license = "MIT"
