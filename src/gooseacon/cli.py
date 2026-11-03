@@ -14,6 +14,16 @@ from gooseacon.auth import get_credentials, login_oauth, token_path
 from gooseacon.client import execute, guarded, service, site_url
 from gooseacon.config import Config, load_config, save_config
 from gooseacon.output import Format, emit
+from gooseacon.update import (
+    UpgradeError,
+    install_info,
+    installed_version,
+    is_newer,
+    latest_release,
+    pending_notice,
+    perform_upgrade,
+    upgrade_command,
+)
 
 app = typer.Typer(help="Google Search Console CLI.", no_args_is_help=True)
 auth = typer.Typer(
@@ -45,19 +55,87 @@ def output_format(value: Format | None) -> Format:
     return value or Format(load_config().output_format)
 
 
-def version(value: bool) -> None:
+def version_callback(value: bool) -> None:
     if value:
         typer.echo(f"gooseacon {__version__}")
         raise typer.Exit()
 
 
+def _show_update_notice() -> None:
+    """Print a best-effort cached notice without affecting command success."""
+    try:
+        if notice := pending_notice():
+            typer.echo(f"\n{notice}", err=True)
+    except Exception:
+        pass
+
+
 @app.callback()
 def main(
+    ctx: typer.Context,
     version_flag: Annotated[
-        bool, typer.Option("--version", "-V", callback=version, is_eager=True)
+        bool, typer.Option("--version", "-V", callback=version_callback, is_eager=True)
     ] = False,
 ) -> None:
     """Google Search Console CLI."""
+    if ctx.invoked_subcommand not in (None, "version", "upgrade"):
+        ctx.call_on_close(_show_update_notice)
+
+
+@app.command("version")
+def version_command(as_json: bool = typer.Option(False, "--json")) -> None:
+    """Show the installed version and latest stable GitHub release."""
+    current = installed_version() or __version__
+    latest = latest_release()
+    available = is_newer(latest, current)
+    command = upgrade_command(latest) if latest and available else None
+    result = {
+        "installed": current,
+        "latest": latest,
+        "update_available": available,
+        "upgrade_command": command,
+    }
+    if as_json:
+        typer.echo(json.dumps(result, indent=2))
+        return
+    typer.echo(f"Installed: {current}")
+    typer.echo(f"Latest: {latest or 'unknown'}")
+    typer.echo(f"Update available: {'yes' if available else 'no'}")
+    if command:
+        typer.echo(f"To upgrade, run: {command}")
+
+
+@app.command("upgrade")
+def upgrade(yes: bool = typer.Option(False, "--yes", "-y")) -> None:
+    """Upgrade gooseacon to the latest stable GitHub release."""
+    current = installed_version() or __version__
+    latest = latest_release()
+    if latest is None:
+        typer.echo("Could not determine the latest gooseacon release from GitHub.", err=True)
+        raise typer.Exit(1)
+    if not is_newer(latest, current):
+        typer.echo(f"gooseacon is already up to date ({current}; latest release {latest}).")
+        return
+
+    command = upgrade_command(latest)
+    if install_info()["kind"] == "editable":
+        typer.echo("Editable install detected; gooseacon will not modify your checkout.")
+        typer.echo(f"Update it with: {command}")
+        return
+
+    typer.echo(f"gooseacon {current} → {latest}")
+    typer.echo(f"Will run: {command}")
+    if not yes and not typer.confirm("Proceed with the upgrade?"):
+        typer.echo("Upgrade cancelled.")
+        return
+    try:
+        result = perform_upgrade(latest)
+    except UpgradeError as exc:
+        typer.echo(str(exc), err=True)
+        raise typer.Exit(1) from exc
+    if output := (result.stdout or "").strip():
+        typer.echo(output)
+    typer.echo(f"Upgraded gooseacon to {latest}.")
 
 
 @auth.command("login")

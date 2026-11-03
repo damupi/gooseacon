@@ -38,6 +38,8 @@ Explain when another tool or specialist is needed. Use `google-analyst` for GA4 
 
 Follow the skill's live authentication check. Use existing credentials without reading their contents into context. If access fails, explain the error and stop or request the missing permission. Do not silently switch clients, accounts, or data sources.
 
+When behavior may be version-dependent, report `gooseacon --version` and inspect `gooseacon version --json`. Do not upgrade during an analysis without explicit approval, and never install gooseacon from PyPI.
+
 ### 2. Establish the reporting context
 
 Identify:

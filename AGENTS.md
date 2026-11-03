@@ -152,11 +152,13 @@ Settings and credentials normally live under `~/.config/gooseacon/`, outside the
 | `src/gooseacon/auth.py` | OAuth2, service-account, environment token, and ADC credentials |
 | `src/gooseacon/config.py` | Validated settings, environment overrides, atomic private writes |
 | `src/gooseacon/output.py` | JSON/CSV/table rendering, output files, CSV formula protection |
+| `src/gooseacon/update.py` | Bounded public release lookup, cache, install detection, and safe upgrades |
 | `src/gooseacon/__init__.py` | Runtime version |
 | `src/gooseacon/__main__.py` | `python -m gooseacon` entry point |
 | `tests/test_gooseacon.py` | CLI, validation, authentication, pagination, and output tests |
 | `tests/test_contract.py` | Real Google discovery-client request construction without network execution |
 | `tests/test_safety.py` | Filter-dimension validation and CSV formula-injection protection |
+| `tests/test_update.py` | Release lookup, credential isolation, caching, and upgrade behavior |
 | `skills/gooseacon-cli/` | Agent-facing CLI workflow and references |
 | `agents/search-console-analyst.md` | Repository-only analyst role |
 | `.github/workflows/ci.yml` | Lint, formatting, tests, build on Python 3.11–3.14 |
@@ -175,7 +177,7 @@ Sites, sitemaps, and Search Analytics use `webmasters/v3`. URL Inspection uses `
 - Do not persist environment tokens or environment overrides into saved settings.
 - Add regression tests for behavior changes, especially auth, errors, request bodies, pagination, and output safety.
 - Update `README.md` and the relevant skill/reference when command behavior changes. Keep the agent focused on analysis rather than duplicating CLI syntax.
-- Let Release Please manage version bumps through its release PR. Its Python strategy updates `pyproject.toml` and `src/gooseacon/__init__.py`; the configured TOML extra-file updater changes only gooseacon's version in `uv.lock`. The manifest and changelog are also release-managed. Do not bump versions or publish releases unless requested.
+- Let Release Please manage version bumps through its release PR. Its Python strategy updates `pyproject.toml` and `src/gooseacon/__init__.py`; extra-file updaters synchronize `uv.lock` and `skills/gooseacon-cli/compatibility.json`. The manifest and changelog are also release-managed. Do not bump versions or publish releases unless requested.
 
 ## Safety boundaries
 
@@ -189,7 +191,7 @@ Sites, sitemaps, and Search Analytics use `webmasters/v3`. URL Inspection uses `
 
 ## Release workflow
 
-Configuration lives in `release-please-config.json` and `.release-please-manifest.json`; `.github/workflows/release-please.yml` opens release PRs on `main` pushes and creates releases after they are merged. Use Conventional Commits (`feat:`, `fix:`, and breaking-change markers). The empty bootstrap manifest means no version has yet been released, not that the current package version is missing.
+Configuration lives in `release-please-config.json` and `.release-please-manifest.json`; `.github/workflows/release-please.yml` opens release PRs on `main` pushes and creates releases after they are merged. Use Conventional Commits (`feat:`, `fix:`, and breaking-change markers). The manifest records the latest published version.
 
 Before an authorized release, review its PR, ensure all version locations agree, and run CI on its head branch. With the workflow's default `GITHUB_TOKEN`, generated PRs do not automatically trigger PR CI. Use `gh workflow run ci.yml --ref <release-head-branch> --repo damupi/gooseacon`, verify that run succeeded, then merge only with authorization. Release Please publishes the tag and GitHub release; the same workflow tests/builds the tagged source and attaches distributions. It does not publish to PyPI. See the README's release section for permissions and upload recovery.
 
@@ -205,6 +207,7 @@ uv run ruff format --check .
 uv run pytest
 uv build
 uv run gooseacon --version
+uv run gooseacon version --json
 uv run python -m gooseacon --version
 git diff --check
 ```
