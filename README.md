@@ -10,14 +10,17 @@ For LLM setup, repository orientation, and agent installation options, read [`AG
 
 Python 3.11+ required.
 
+Choose the current `vX.Y.Z` tag from [GitHub Releases](https://github.com/damupi/gooseacon/releases), then install that exact release:
+
 ```sh
-uv tool install git+https://github.com/damupi/gooseacon.git
-# Or:
-pipx install git+https://github.com/damupi/gooseacon.git
+uv tool install "git+https://github.com/damupi/gooseacon@vX.Y.Z"
 
 gooseacon --help
 gooseacon --version
+gooseacon version
 ```
+
+Releases are distributed from GitHub only; gooseacon is not published to PyPI.
 
 For development:
 
@@ -119,6 +122,8 @@ Pass `--site-url` (alias `--site`) to any property-scoped command to override th
 | `urls inspect URL` | Indexed status and rich-result inspection |
 | `auth login` / `auth status` / `auth logout` | Authentication management |
 | `config show` / `config set KEY VALUE` / `config unset KEY` | Local settings |
+| `version [--json]` | Installed version, latest GitHub release, and upgrade command |
+| `upgrade [--yes]` | Install the latest stable GitHub release |
 
 Use `gooseacon <group> <command> --help` for all options. Write operations and logout require confirmation; pass `--yes` only when you intend the change. Adding a property does not verify ownership. Removing a sitemap does not delete the file from your website. The CLI never automates site verification or requests indexing.
 
@@ -218,7 +223,7 @@ Python + Typer + Pydantic + Google's API client. Sites, sitemaps, and Search Ana
 
 ## Releases
 
-[Release Please](https://github.com/googleapis/release-please) maintains a release PR from Conventional Commits on `main`. Merging the release PR updates `CHANGELOG.md`, the manifest, `pyproject.toml`, the runtime version, and the locked local-package version. The next workflow run creates a `vX.Y.Z` GitHub release and uploads a tested wheel and source distribution. It does not publish to PyPI.
+[Release Please](https://github.com/googleapis/release-please) maintains a release PR from Conventional Commits on `main`. Merging the release PR updates `CHANGELOG.md`, the manifest, `pyproject.toml`, the runtime version, the bundled skill compatibility version, and the locked local-package version. The next workflow run creates a `vX.Y.Z` GitHub release and uploads a tested wheel and source distribution. It does not publish to PyPI.
 
 Use `feat:` for features, `fix:` for fixes, and `!` / `BREAKING CHANGE:` for breaking changes. Review release PRs before merging; do not edit published tags. The initial empty manifest bootstraps the Python strategy's first release at `0.1.0`; subsequent versions are tracked automatically.
 
@@ -232,11 +237,16 @@ gh run list --workflow ci.yml --branch RELEASE_BRANCH --repo damupi/gooseacon
 
 Wait for that run to succeed and inspect its logs before merging. PRs created with a user/App token may trigger CI normally. No personal token is stored by this setup. If artifact upload fails after the GitHub release is created, check out its tag, rerun the validation/build steps, and upload only that tag's distributions; rerunning Release Please alone may not repeat the upload.
 
-To install a published version instead of the latest `main`:
+The CLI checks for updates at most once per day during interactive commands. Checks are skipped in CI, when stderr is not a TTY, or when `GOOSEACON_NO_UPDATE_CHECK` is set. The cache is `~/.config/gooseacon/update-check.json` (or under `GOOSEACON_CONFIG_DIR`). Explicit checks are always available:
 
 ```sh
-uv tool install git+https://github.com/damupi/gooseacon.git@v0.1.0
+gooseacon version
+gooseacon version --json
+gooseacon upgrade
+gooseacon upgrade --yes
 ```
+
+All upgrade commands install a tag-pinned GitHub URL. Editable checkouts are never modified automatically.
 
 ## License
 

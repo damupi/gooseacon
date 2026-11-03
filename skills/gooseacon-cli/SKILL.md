@@ -50,6 +50,9 @@ gooseacon analytics query --help
 
 Use `--help` on any command before guessing flags. Apply flags at the command level, not before the group name.
 
+- Use `gooseacon --version` for the installed version. Use `gooseacon version --json` to compare it with the latest stable GitHub release and obtain the exact upgrade command.
+- Do not upgrade during an active analysis unless the user explicitly asks. `gooseacon upgrade` prompts; `--yes` skips confirmation. Editable checkouts are never modified automatically.
+- Releases are installed from tag-pinned `git+https://github.com/damupi/gooseacon@vX.Y.Z` URLs, never from PyPI. Set `GOOSEACON_NO_UPDATE_CHECK=1` to disable the silent once-daily interactive check.
 - Pass `--format json` explicitly on read/report commands for machine parsing; a saved configuration can otherwise change the default to table/CSV.
 - Use `--format csv --output /absolute/path/report.csv` for requested exports.
 - Use `--format table` for human-readable output.
